@@ -19,6 +19,7 @@ router.get('/', async () => {
     hello: 'world',
   }
 })
+
 router
   .group(() => {
     router.get('/', [UsersController, 'index'])

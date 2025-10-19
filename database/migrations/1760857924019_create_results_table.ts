@@ -1,18 +1,31 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
-export default class extends BaseSchema {
+export default class Results extends BaseSchema {
   protected tableName = 'results'
 
-  async up() {
+  public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-
-      table.timestamp('created_at')
-      table.timestamp('updated_at')
+      table
+        .integer('user_id')
+        .unsigned()
+        .notNullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
+      table
+        .integer('quiz_id')
+        .unsigned()
+        .notNullable()
+        .references('id')
+        .inTable('quizzes')
+        .onDelete('CASCADE')
+      table.integer('score').defaultTo(0)
+      table.timestamp('submitted_at', { useTz: true }).defaultTo(this.now())
     })
   }
 
-  async down() {
+  public async down() {
     this.schema.dropTable(this.tableName)
   }
 }

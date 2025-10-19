@@ -10,7 +10,6 @@ export default class UserAnswersController {
     const answers = await UserAnswer.query().preload('user').preload('quiz').preload('question')
     return response.ok(answers)
   }
-
   /**
    * GET /user-answers/:user_id
    * Ambil jawaban user tertentu

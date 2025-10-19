@@ -25,19 +25,16 @@ export default class Quiz extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updated_at: DateTime
 
-  // Relasi: quiz dimiliki oleh satu user
   @belongsTo(() => User, {
     foreignKey: 'created_by',
   })
   declare user: BelongsTo<typeof User>
 
-  // Relasi: satu quiz memiliki banyak pertanyaan
   @hasMany(() => Question, {
     foreignKey: 'quiz_id',
   })
   declare questions: HasMany<typeof Question>
 
-  // ✅ Relasi baru: satu quiz memiliki banyak hasil (results)
   @hasMany(() => Result, {
     foreignKey: 'quiz_id',
   })

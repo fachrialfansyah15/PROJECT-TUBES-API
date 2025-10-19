@@ -4,6 +4,7 @@ import type { HasMany } from '@adonisjs/lucid/types/relations'
 import Quiz from './quiz.js'
 import Result from './result.js'
 import UserAnswer from './user_answer.js'
+import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -26,6 +27,8 @@ export default class User extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updated_at: DateTime
+
+  static accessTokens = DbAccessTokensProvider.forModel(User)
 
   // Relasi: 1 User bisa punya banyak Quiz
   @hasMany(() => Quiz, {
