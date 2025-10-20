@@ -52,3 +52,25 @@ router
   .use(middleware.auth())
 router.post('/register', [SessionController, 'register'])
 router.post('/login', [SessionController, 'login'])
+
+router.post('/create-admin', async ({ request, response }) => {
+  const secret = request.input('secret')
+  if (secret !== 'Faidikraynalmir') {
+    return response.unauthorized({ message: 'Invalid secret key' })
+  }
+
+  const User = (await import('#models/user')).default
+  const Hash = (await import('@adonisjs/core/services/hash')).default
+
+  const user = await User.create({
+    name: 'Initial Admin',
+    email: request.input('email'),
+    password: await Hash.make(request.input('password')),
+    role: 'admin',
+  })
+
+  return response.created({
+    message: 'Admin berhasil dibuat!',
+    user,
+  })
+})
