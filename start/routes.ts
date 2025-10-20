@@ -37,7 +37,7 @@ router
     // User Answers CRUD
     router.get('/user_answers', [UserAnswersController, 'index']).use(middleware.role(['admin']))
     router.get('/user_answers/:id', [UserAnswersController, 'show']).use(middleware.role(['admin', 'user']))
-    router.post('/user_answers', [UserAnswersController, 'store']).use(middleware.role(['admin']))
+    router.post('/user_answers', [UserAnswersController, 'store']).use(middleware.role(['user']))
     router.put('/user_answers/:id', [UserAnswersController, 'update']).use(middleware.role(['admin']))
     router.delete('/user_answers/:id', [UserAnswersController, 'destroy']).use(middleware.role(['admin']))
 
