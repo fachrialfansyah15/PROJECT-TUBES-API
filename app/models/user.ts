@@ -1,17 +1,25 @@
 import { DateTime } from 'luxon'
+import hash from '@adonisjs/core/services/hash'
+import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
+import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Quiz from './quiz.js'
 import Result from './result.js'
 import UserAnswer from './user_answer.js'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 
+const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
+  uids: ['email'],
+  passwordColumnName: 'password',
+})
 
-export default class User extends BaseModel {
+export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare name: string
+  declare name: string | null
 
   @column()
   declare email: string
@@ -23,13 +31,11 @@ export default class User extends BaseModel {
   declare role: 'admin' | 'user'
 
   @column.dateTime({ autoCreate: true })
-  declare created_at: DateTime
+  declare createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updated_at: DateTime
+  declare updatedAt: DateTime | null
 
-
-  // Relasi: 1 User bisa punya banyak Quiz
   @hasMany(() => Quiz, {
     foreignKey: 'created_by',
   })
@@ -44,4 +50,6 @@ export default class User extends BaseModel {
     foreignKey: 'user_id',
   })
   declare userAnswers: HasMany<typeof UserAnswer>
+
+  static accessTokens = DbAccessTokensProvider.forModel(User)
 }
