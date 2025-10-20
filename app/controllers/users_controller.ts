@@ -2,39 +2,26 @@ import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 
 export default class UsersController {
-  /**
-   * GET /users
-   * Ambil semua user
-   */
-  async index({ response }: HttpContext) {
+  public async index({ auth, response }: HttpContext) {
+    await (auth as any).use('api').authenticate()
     const users = await User.all()
     return response.ok(users)
   }
 
-  /**
-   * GET /users/:id
-   * Ambil detail user berdasarkan ID
-   */
-  async show({ params, response }: HttpContext) {
+  public async show({ auth, params, response }: HttpContext) {
+    await (auth as any).use('api').authenticate()
     const user = await User.findOrFail(params.id)
     return response.ok(user)
   }
 
-  /**
-   * POST /users
-   * Tambah user baru
-   */
-  async store({ request, response }: HttpContext) {
+  public async store({ request, response }: HttpContext) {
     const data = request.only(['name', 'email', 'password', 'role'])
     const user = await User.create(data)
     return response.created(user)
   }
 
-  /**
-   * PUT /users/:id
-   * Update user berdasarkan ID
-   */
-  async update({ params, request, response }: HttpContext) {
+  public async update({ auth, params, request, response }: HttpContext) {
+    await (auth as any).use('api').authenticate()
     const user = await User.findOrFail(params.id)
     const data = request.only(['name', 'email', 'password', 'role'])
     user.merge(data)
@@ -42,11 +29,8 @@ export default class UsersController {
     return response.ok(user)
   }
 
-  /**
-   * DELETE /users/:id
-   * Hapus user berdasarkan ID
-   */
-  async destroy({ params, response }: HttpContext) {
+  public async destroy({ auth, params, response }: HttpContext) {
+    await (auth as any).use('api').authenticate()
     const user = await User.findOrFail(params.id)
     await user.delete()
     return response.ok({ message: 'User deleted successfully' })

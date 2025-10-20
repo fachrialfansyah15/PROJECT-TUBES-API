@@ -1,37 +1,28 @@
 import { defineConfig } from '@adonisjs/auth'
-import { sessionGuard, sessionUserProvider } from '@adonisjs/auth/session'
-import { jwtGuard } from '@maximemrf/adonisjs-jwt/jwt_config'
-import env from '#start/env'
-import User from '#models/user'
+import { tokensGuard, tokensUserProvider } from '@adonisjs/auth/access_tokens'
+import type { InferAuthenticators, InferAuthEvents, Authenticators } from '@adonisjs/auth/types'
 
 const authConfig = defineConfig({
-  default: 'jwt',
-
+  default: 'api',
   guards: {
-    web: sessionGuard({
-      useRememberMeTokens: false,
-      provider: sessionUserProvider({
+    api: tokensGuard({
+      provider: tokensUserProvider({
+        tokens: 'accessTokens',
         model: () => import('#models/user'),
-      }),
-    }),
-
-    jwt: jwtGuard({
-      tokenName: 'token',
-      tokenExpiresIn: '1h',
-      useCookies: false,
-      secret: env.get('JWT_SECRET'),
-
-      provider: sessionUserProvider({
-        model: () => import('#models/user'),
-      }),
-
-      // ✅ gunakan getOriginal() untuk ambil properti model User
-      content: (user) => ({
-        userId: user.getId(),
-        email: (user.getOriginal() as User).email,
       }),
     }),
   },
 })
 
 export default authConfig
+
+/**
+ * Inferring types from the configured auth
+ * guards.
+ */
+declare module '@adonisjs/auth/types' {
+  export interface Authenticators extends InferAuthenticators<typeof authConfig> {}
+}
+declare module '@adonisjs/core/types' {
+  interface EventsList extends InferAuthEvents<Authenticators> {}
+}

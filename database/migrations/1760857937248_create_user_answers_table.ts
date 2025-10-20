@@ -1,4 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+import { doesNotThrow } from 'assert'
 
 export default class UserAnswers extends BaseSchema {
   protected tableName = 'user_answers'
