@@ -8,7 +8,7 @@ import { useAuth } from '../auth/AuthContext.js'
 const h = React.createElement
 
 export default function Home() {
-  const { quizzes } = useQuizStore()
+  const { quizzes, loading, error } = useQuizStore()
   const { logout } = useAuth()
   const navigate = useNavigate()
 
@@ -37,11 +37,29 @@ export default function Home() {
       h(
         'main',
         { className: 'px-6 pb-16' },
-        h(
-          'div',
-          { className: 'grid gap-6 md:grid-cols-2' },
-          quizzes.map((q) => h(QuizCard, { key: q.id, quiz: q, ctaTo: `/quiz/${q.id}`, ctaLabel: 'Mulai Kuis' }))
-        )
+        loading
+          ? h('div', { className: 'text-center py-12' }, [
+              h('div', { className: 'inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--color-primary)] border-r-transparent' }),
+              h('p', { className: 'mt-4 text-[var(--color-muted)]' }, 'Memuat kuis...')
+            ])
+          : error
+          ? h('div', { className: 'max-w-md mx-auto text-center py-12' }, [
+              h('div', { className: 'rounded-lg bg-red-50 border border-red-200 p-6' }, [
+                h('p', { className: 'text-red-600 font-medium' }, 'Gagal memuat kuis'),
+                h('p', { className: 'text-red-500 text-sm mt-2' }, error),
+                h('p', { className: 'text-sm text-[var(--color-muted)] mt-4' }, 'Pastikan backend sudah berjalan di http://localhost:3333')
+              ])
+            ])
+          : quizzes.length === 0
+          ? h('div', { className: 'text-center py-12' }, [
+              h('p', { className: 'text-[var(--color-muted)]' }, 'Belum ada kuis tersedia'),
+              h('p', { className: 'text-sm text-[var(--color-muted)] mt-2' }, 'Silakan buat kuis baru dari dashboard admin')
+            ])
+          : h(
+              'div',
+              { className: 'grid gap-6 md:grid-cols-2' },
+              quizzes.map((q) => h(QuizCard, { key: q.id, quiz: q, ctaTo: `/quiz/${q.id}`, ctaLabel: 'Mulai Kuis' }))
+            )
       ),
     ]
   )

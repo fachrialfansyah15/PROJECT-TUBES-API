@@ -6,14 +6,8 @@ import { useQuizStore } from '../store/quizStore.js'
 
 export default function AdminDashboard() {
   const h = React.createElement
-  const { quizzes, resetToDefaults, migrateQuizzesToIndonesian } = useQuizStore()
+  const { quizzes, loading, error, resetToDefaults, refetch } = useQuizStore()
   const [migrationMessage, setMigrationMessage] = useState('')
-
-  function handleMigrate() {
-    const result = migrateQuizzesToIndonesian()
-    setMigrationMessage(result.message)
-    setTimeout(() => setMigrationMessage(''), 3000)
-  }
   
   return h(
     'div',
@@ -29,19 +23,15 @@ export default function AdminDashboard() {
           h('div', { className: 'text-sm font-medium' }, '✨ Fitur Admin'),
           h('div', { className: 'flex gap-2' }, [
             h('button', { 
-              onClick: handleMigrate, 
-              className: 'flex items-center gap-2 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs text-blue-700 hover:bg-blue-100 transition',
-              title: 'Translate semua kuis ke Bahasa Indonesia'
-            }, [
-              h(Languages, { size: 14 }), 'Migrate ke ID'
-            ]),
-            h('button', { 
               onClick: () => { 
-                if (confirm('Reset semua data quiz dan hasil ke default?')) resetToDefaults() 
+                refetch() 
+                setMigrationMessage('Data kuis berhasil dimuat ulang')
+                setTimeout(() => setMigrationMessage(''), 3000)
               }, 
-              className: 'flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-xs text-[var(--color-muted)] hover:bg-white/70 transition' 
+              className: 'flex items-center gap-2 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs text-blue-700 hover:bg-blue-100 transition',
+              title: 'Muat ulang data kuis dari server'
             }, [
-              h(RefreshCw, { size: 14 }), 'Reset Data'
+              h(RefreshCw, { size: 14 }), 'Refresh Data'
             ]),
           ]),
         ]),
@@ -57,15 +47,32 @@ export default function AdminDashboard() {
           ]),
         ]),
       ]),
-      h('div', { className: 'grid gap-4 md:grid-cols-2' }, 
-        quizzes.map((q) => 
-          h(QuizCard, { 
-            key: q.id, 
-            quiz: q, 
-            hideCta: true 
-          })
-        )
-      ),
+      loading
+        ? h('div', { className: 'text-center py-12' }, [
+            h('div', { className: 'inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--color-primary)] border-r-transparent' }),
+            h('p', { className: 'mt-4 text-[var(--color-muted)]' }, 'Memuat kuis...')
+          ])
+        : error
+        ? h('div', { className: 'max-w-md mx-auto text-center py-12' }, [
+            h('div', { className: 'rounded-lg bg-red-50 border border-red-200 p-6' }, [
+              h('p', { className: 'text-red-600 font-medium' }, 'Gagal memuat kuis'),
+              h('p', { className: 'text-red-500 text-sm mt-2' }, error)
+            ])
+          ])
+        : quizzes.length === 0
+        ? h('div', { className: 'text-center py-12 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]' }, [
+            h('p', { className: 'text-[var(--color-muted)]' }, 'Belum ada kuis tersedia'),
+            h('p', { className: 'text-sm text-[var(--color-muted)] mt-2' }, 'Klik "Buat Kuis Baru" untuk memulai')
+          ])
+        : h('div', { className: 'grid gap-4 md:grid-cols-2' }, 
+            quizzes.map((q) => 
+              h(QuizCard, { 
+                key: q.id, 
+                quiz: q, 
+                hideCta: true 
+              })
+            )
+          ),
     ]
   )
 }

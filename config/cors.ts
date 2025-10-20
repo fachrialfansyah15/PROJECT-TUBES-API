@@ -8,10 +8,15 @@ import { defineConfig } from '@adonisjs/cors'
  */
 const corsConfig = defineConfig({
   enabled: true,
-  origin: true,
-  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE'],
+  origin: [
+    'http://localhost:5173', // Vite default port
+    'http://localhost:3000', // Alternative React port
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+  ],
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   headers: true,
-  exposeHeaders: [],
+  exposeHeaders: ['X-Total-Count'],
   credentials: true,
   maxAge: 90,
 })

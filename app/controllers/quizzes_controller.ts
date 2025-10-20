@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Quiz from '#models/quiz'
+import Question from '#models/question'
 
 export default class QuizzesController {
   /**
@@ -7,8 +8,24 @@ export default class QuizzesController {
    * Ambil semua data quiz
    */
   async index({ response }: HttpContext) {
-    const quizzes = await Quiz.query().preload('user').preload('questions')
-    return response.ok(quizzes)
+    try {
+      const quizzes = await Quiz.query()
+        .preload('user')
+        .preload('questions')
+        .orderBy('created_at', 'desc')
+      
+      return response.ok({
+        success: true,
+        data: quizzes,
+        message: 'Quizzes retrieved successfully'
+      })
+    } catch (error) {
+      return response.badRequest({
+        success: false,
+        message: 'Failed to retrieve quizzes',
+        error: error.message
+      })
+    }
   }
 
   /**
@@ -16,23 +33,80 @@ export default class QuizzesController {
    * Ambil detail quiz berdasarkan id
    */
   async show({ params, response }: HttpContext) {
-    const quiz = await Quiz.query()
-      .where('id', params.id)
-      .preload('user')
-      .preload('questions')
-      .firstOrFail()
+    try {
+      const quiz = await Quiz.query()
+        .where('id', params.id)
+        .preload('user')
+        .preload('questions')
+        .firstOrFail()
 
-    return response.ok(quiz)
+      return response.ok({
+        success: true,
+        data: quiz,
+        message: 'Quiz retrieved successfully'
+      })
+    } catch (error) {
+      return response.notFound({
+        success: false,
+        message: 'Quiz not found',
+        error: error.message
+      })
+    }
   }
 
   /**
    * POST /quizzes
    * Tambah quiz baru
    */
-  async store({ request, response }: HttpContext) {
-    const data = request.only(['title', 'description', 'created_by'])
-    const quiz = await Quiz.create(data)
-    return response.created(quiz)
+  async store({ request, response, auth }: HttpContext) {
+    try {
+      const data = request.only(['title', 'description', 'questions'])
+      const userId = await auth.user?.id || 1 // Default to user ID 1 if not authenticated
+      
+      // Validasi input
+      if (!data.title || data.title.trim() === '') {
+        return response.badRequest({
+          success: false,
+          message: 'Title is required'
+        })
+      }
+      
+      const quiz = await Quiz.create({
+        title: data.title.trim(),
+        description: data.description?.trim() || '',
+        created_by: userId,
+      })
+      
+      // Simpan questions jika ada
+      if (data.questions && Array.isArray(data.questions)) {
+        for (const q of data.questions) {
+          await Question.create({
+            quiz_id: quiz.id,
+            question_text: q.prompt || '',
+            option_a: q.options?.[0]?.text || '',
+            option_b: q.options?.[1]?.text || '',
+            option_c: q.options?.[2]?.text || '',
+            option_d: q.options?.[3]?.text || '',
+            correct_answer: q.answerId || 'a',
+          })
+        }
+      }
+      
+      // Load dengan questions
+      await quiz.load('questions')
+      
+      return response.created({
+        success: true,
+        data: quiz,
+        message: 'Quiz created successfully'
+      })
+    } catch (error) {
+      return response.badRequest({
+        success: false,
+        message: 'Failed to create quiz',
+        error: error.message
+      })
+    }
   }
 
   /**
