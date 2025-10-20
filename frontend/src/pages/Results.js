@@ -1,5 +1,7 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { LogOut } from 'lucide-react'
+import { useAuth } from '../auth/AuthContext.js'
 
 const h = React.createElement
 
@@ -7,13 +9,30 @@ export default function Results() {
   const correct = 7
   const total = 10
   const percentage = Math.round((correct / total) * 100)
+  const { logout } = useAuth()
+  const navigate = useNavigate()
 
   return h(
     'div',
     { className: 'min-h-dvh bg-[var(--color-background)] text-[var(--color-foreground)]' },
-    h(
-      'main',
-      { className: 'px-6 pt-16 pb-10' },
+    [
+      h('div', { className: 'flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)]' }, [
+        h('div', { className: 'text-sm font-semibold text-[var(--color-muted)]' }, 'QUIZZZ APP - KELOMPOK 9'),
+        h(
+          'button',
+          {
+            onClick: () => {
+              logout()
+              navigate('/login', { replace: true })
+            },
+            className: 'flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm hover:bg-gray-50 transition',
+          },
+          [h(LogOut, { size: 16 }), 'Logout']
+        ),
+      ]),
+      h(
+        'main',
+        { className: 'px-6 pt-16 pb-10' },
       h(
         'section',
         { className: 'mx-auto max-w-md rounded-3xl bg-[var(--color-card)] p-8 text-center ring-1 ring-[var(--color-border)]' },
@@ -31,7 +50,8 @@ export default function Results() {
           ]),
         ]
       )
-    )
+      ),
+    ]
   )
 }
 
