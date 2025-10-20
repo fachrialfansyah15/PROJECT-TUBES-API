@@ -28,7 +28,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare password: string
 
   @column()
-  declare role: 'admin' | 'user'
+  declare role: 'admin' | 'user' | 'superadmin'
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
