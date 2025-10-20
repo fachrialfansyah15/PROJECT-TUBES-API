@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, LogOut } from 'lucide-react'
 import { useQuizById, useQuizStore, evaluateScore } from '../store/quizStore.js'
 import { translateQuizOptimized } from '../services/translateService.js'
+import { useAuth } from '../auth/AuthContext.js'
 
 export default function Quiz() {
   const navigate = useNavigate()
   const { id } = useParams()
   const originalQuiz = useQuizById(id)
   const { addResult } = useQuizStore()
+  const { logout } = useAuth()
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState(null)
   const [answers, setAnswers] = useState([])
@@ -58,17 +60,34 @@ export default function Quiz() {
     [
       h(
         'header',
-        { className: 'flex items-center gap-3 px-6 py-5' },
+        { className: 'flex items-center justify-between px-6 py-5 border-b border-[var(--color-border)]' },
         [
+          h(
+            'div',
+            { className: 'flex items-center gap-3' },
+            [
+              h(
+                'button',
+                {
+                  onClick: () => navigate(-1),
+                  className: 'inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-card)] hover:bg-white ring-1 ring-[var(--color-border)]',
+                },
+                h(ChevronLeft)
+              ),
+              h('h1', { className: 'text-lg font-medium capitalize' }, quiz?.title ?? 'Kuis'),
+            ]
+          ),
           h(
             'button',
             {
-              onClick: () => navigate(-1),
-              className: 'inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-card)] hover:bg-white ring-1 ring-[var(--color-border)]',
+              onClick: () => {
+                logout()
+                navigate('/login', { replace: true })
+              },
+              className: 'flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm hover:bg-gray-50 transition',
             },
-            h(ChevronLeft)
+            [h(LogOut, { size: 16 }), 'Logout']
           ),
-          h('h1', { className: 'text-lg font-medium capitalize' }, quiz?.title ?? 'Kuis'),
         ]
       ),
       h(
@@ -83,31 +102,44 @@ export default function Quiz() {
               style: { width: `${progress}%` },
             })
           ),
-          h(
-            'section',
-            { className: 'mb-4 rounded-2xl bg-[var(--color-card)] p-5 ring-1 ring-[var(--color-border)]' },
-            h('p', { className: 'text-base leading-relaxed' }, quiz?.questions[current]?.prompt)
-          ),
-          h(
-            'div',
-            { className: 'grid gap-3' },
-            (quiz?.questions[current]?.options || []).map((opt) => {
-              const isSelected = selected === opt.id
-              return h(
-                'button',
-                {
-                  key: opt.id,
-                  onClick: () => setSelected(opt.id),
-                  className:
-                    'text-left rounded-2xl px-4 py-4 ring-1 transition ' +
-                    (isSelected
-                      ? 'bg-[var(--color-primary)] text-white ring-transparent'
-                      : 'bg-[var(--color-card)] text-[var(--color-foreground)] ring-[var(--color-border)] hover:bg-white'),
-                },
-                opt.text
-              )
-            })
-          ),
+           h(
+             'section',
+             { className: 'mb-4 rounded-2xl bg-[var(--color-card)] p-5 ring-1 ring-[var(--color-border)]' },
+             h('p', { className: 'text-base leading-relaxed font-semibold' }, quiz?.questions[current]?.prompt)
+           ),
+           h(
+             'div',
+             { className: 'grid gap-3' },
+             (quiz?.questions[current]?.options || []).map((opt, index) => {
+               const isSelected = selected === opt.id
+               const optionLabel = String.fromCharCode(65 + index)
+               return h(
+                 'button',
+                 {
+                   key: opt.id,
+                   onClick: () => setSelected(opt.id),
+                   className:
+                     'text-left rounded-2xl px-4 py-4 ring-1 transition flex items-start gap-3 ' +
+                     (isSelected
+                       ? 'bg-[var(--color-primary)] text-white ring-transparent'
+                       : 'bg-[var(--color-card)] text-[var(--color-foreground)] ring-[var(--color-border)] hover:bg-white'),
+                 },
+                 [
+                   h(
+                     'span',
+                     {
+                       className: 'inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg font-semibold ' +
+                         (isSelected
+                           ? 'bg-white/20 text-white'
+                           : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]')
+                     },
+                     optionLabel
+                   ),
+                   h('span', { className: 'flex-1 pt-0.5' }, opt.text)
+                 ]
+               )
+             })
+           ),
           h(
             'div',
             { className: 'mt-6 flex items-center justify-between' },
@@ -136,7 +168,15 @@ export default function Quiz() {
                         percentage: result.percentage,
                         time: new Date().toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
                       })
-                      navigate('/results')
+                      navigate('/results', {
+                        state: {
+                          correct: result.correct,
+                          total: result.total,
+                          percentage: result.percentage,
+                          quizTitle: quiz?.title ?? 'Kuis',
+                          quizId: quiz?.id
+                        }
+                      })
                     }
                   },
                   disabled: !selected,
