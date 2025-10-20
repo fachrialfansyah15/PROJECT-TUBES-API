@@ -13,12 +13,15 @@ import UsersController from '#controllers/users_controller'
 import QuestionsController from '#controllers/questions_controller'
 import ResultsController from '#controllers/results_controller'
 import UserAnswersController from '#controllers/user_answers_controller'
-
+import AuthController from '#controllers/auth_controller'
 router.get('/', async () => {
   return {
     hello: 'world',
   }
 })
+
+router.post('/register', [AuthController, 'register'])
+router.post('/login', [AuthController, 'login'])
 
 router
   .group(() => {

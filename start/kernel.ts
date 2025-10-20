@@ -10,6 +10,8 @@
 
 import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
+import app from '@adonisjs/core/services/app'
+
 
 /**
  * The error handler is used to convert an exception
@@ -35,8 +37,13 @@ server.use([
 router.use([
   () => import('@adonisjs/core/bodyparser_middleware'),
   () => import('@adonisjs/auth/initialize_auth_middleware'),
+  () => import('#middleware/role_middleware')
 ])
 
+// ✅ Tambahkan provider JWT
+app.booting(async () => {
+  await import('@maximemrf/adonisjs-jwt')
+})
 /**
  * Named middleware collection must be explicitly assigned to
  * the routes or the routes group.
@@ -44,4 +51,5 @@ router.use([
 export const middleware = router.named({
   guest: () => import('#middleware/guest_middleware'),
   auth: () => import('#middleware/auth_middleware'),
+  role: () => import('#middleware/role_middleware'),
 })

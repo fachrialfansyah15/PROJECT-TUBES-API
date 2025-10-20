@@ -1,30 +1,36 @@
 import { defineConfig } from '@adonisjs/auth'
-import { tokensGuard, tokensUserProvider } from '@adonisjs/auth/access_tokens' // <-- Import ini
-
-/**
- * Konfigurasi Guard untuk Opaque Access Tokens (OAT)
- */
-const apiGuard = tokensGuard({
-  provider: tokensUserProvider({
-    // 'accessTokens' harus sesuai dengan nama relasi di User Model
-    tokens: 'accessTokens',
-    model: () => import('#models/User'),
-  }),
-  // Token prefix: Diperlukan untuk verifikasi token yang benar
-  tokenProvider: {
-    type: 'api', // Bisa 'api' atau yang lain.
-    driver: 'database',
-    table: 'access_tokens', // Nama tabel tempat token disimpan
-  },
-})
+import { sessionGuard, sessionUserProvider } from '@adonisjs/auth/session'
+import { jwtGuard } from '@maximemrf/adonisjs-jwt/jwt_config'
+import env from '#start/env'
+import User from '#models/user'
 
 const authConfig = defineConfig({
-  // Atur 'api' sebagai default guard untuk aplikasi API Anda
-  default: 'api',
+  default: 'jwt',
 
   guards: {
-    // Daftarkan guard 'api' menggunakan konfigurasi OAT di atas
-    api: apiGuard,
+    web: sessionGuard({
+      useRememberMeTokens: false,
+      provider: sessionUserProvider({
+        model: () => import('#models/user'),
+      }),
+    }),
+
+    jwt: jwtGuard({
+      tokenName: 'token',
+      tokenExpiresIn: '1h',
+      useCookies: false,
+      secret: env.get('JWT_SECRET'),
+
+      provider: sessionUserProvider({
+        model: () => import('#models/user'),
+      }),
+
+      // ✅ gunakan getOriginal() untuk ambil properti model User
+      content: (user) => ({
+        userId: user.getId(),
+        email: (user.getOriginal() as User).email,
+      }),
+    }),
   },
 })
 
