@@ -29,7 +29,6 @@ export function QuizStoreProvider({ children }) {
     { id: crypto.randomUUID(), userName: 'Ahmad Rizki', quizId: 'general', quizTitle: 'Pengetahuan Umum', correct: 2, total: 2, percentage: 100, time: '19 Okt 2025, 11.00' },
   ]))
 
-  // Fetch quizzes from backend on mount
   useEffect(() => {
     fetchQuizzes()
   }, [])
@@ -42,31 +41,28 @@ export function QuizStoreProvider({ children }) {
       setError(null)
       const response = await api.getQuizzes()
       
-      // Extract data from backend response format
       const data = response.data || response
-      
-      // Transform backend data to frontend format
-      const transformedQuizzes = data.map((quiz) => ({
-        id: quiz.id.toString(),
-        title: quiz.title || 'Untitled Quiz',
-        description: quiz.description || 'No description',
-        createdAt: new Date(quiz.created_at).toLocaleDateString('id-ID', { 
-          day: '2-digit', 
-          month: 'short', 
-          year: 'numeric' 
-        }),
-        questions: Array.isArray(quiz.questions) ? quiz.questions.map((q) => ({
-          id: q.id.toString(),
-          prompt: q.question_text || '',
-          options: [
-            { id: 'a', text: q.option_a || '' },
-            { id: 'b', text: q.option_b || '' },
-            { id: 'c', text: q.option_c || '' },
-            { id: 'd', text: q.option_d || '' },
-          ],
-          answerId: q.correct_answer || 'a',
-        })) : [],
-      }))
+              const transformedQuizzes = data.map((quiz) => ({
+                id: quiz.id.toString(),
+                title: quiz.title || 'Untitled Quiz',
+                description: quiz.description || 'No description',
+                createdAt: quiz.created_at ? new Date(quiz.created_at).toLocaleDateString('id-ID', { 
+                  day: '2-digit', 
+                  month: 'short', 
+                  year: 'numeric' 
+                }) : 'Unknown Date',
+                questions: Array.isArray(quiz.questions) ? quiz.questions.map((q) => ({
+                  id: q.id.toString(),
+                  prompt: q.question_text || '',
+                  options: [
+                    { id: 'a', text: q.option_a || '' },
+                    { id: 'b', text: q.option_b || '' },
+                    { id: 'c', text: q.option_c || '' },
+                    { id: 'd', text: q.option_d || '' },
+                  ],
+                  answerId: q.correct_answer || 'a',
+                })) : [],
+              }))
       
       setQuizzes(transformedQuizzes)
     } catch (err) {
@@ -81,7 +77,6 @@ export function QuizStoreProvider({ children }) {
     try {
       setError(null)
       
-      // Create quiz on backend
       const quizData = {
         title: input.title,
         description: input.description,
@@ -89,10 +84,7 @@ export function QuizStoreProvider({ children }) {
       
       const response = await api.createQuiz(quizData)
       
-      // Extract data from backend response format
       const createdQuiz = response.data || response
-      
-      // Transform to frontend format
       const newQuiz = {
         id: createdQuiz.id.toString(),
         title: createdQuiz.title,
@@ -117,13 +109,35 @@ export function QuizStoreProvider({ children }) {
   async function updateQuiz(id, input) {
     try {
       setError(null)
-      await api.updateQuiz(id, {
+      
+      const quizData = {
         title: input.title,
         description: input.description,
-      })
+        questions: input.questions || []
+      }
       
+      const response = await api.updateQuiz(id, quizData)
+      const updatedQuiz = response.data || response
+      
+      // Update local state with server response
       setQuizzes((prev) => prev.map((q) => 
-        q.id === id ? { ...q, ...input } : q
+        q.id === id ? { 
+          ...q, 
+          title: updatedQuiz.title || input.title,
+          description: updatedQuiz.description || input.description,
+          questions: Array.isArray(updatedQuiz.questions) ? updatedQuiz.questions.map((q) => ({
+            id: q.id.toString(),
+            prompt: q.question_text || '',
+            options: [
+              { id: 'a', text: q.option_a || '' },
+              { id: 'b', text: q.option_b || '' },
+              { id: 'c', text: q.option_c || '' },
+              { id: 'd', text: q.option_d || '' },
+            ],
+            answerId: q.correct_answer || 'a',
+          })) : (input.questions || q.questions),
+          updatedAt: new Date().toISOString()
+        } : q
       ))
     } catch (err) {
       console.error('Failed to update quiz:', err)
@@ -183,7 +197,7 @@ export function useQuizStore() {
 
 export function useQuizById(id) {
   const { quizzes } = useQuizStore()
-  return quizzes.find((q) => q.id === id)
+  return quizzes.find((q) => q.id === id || q.id === String(id) || String(q.id) === String(id))
 }
 
 export function evaluateScore(questions, selectedIds) {

@@ -23,19 +23,16 @@ export default class UserAnswer extends BaseModel {
   @column()
   declare is_correct: boolean
 
-  // Relasi: jawaban ini dimiliki oleh satu user
   @belongsTo(() => User, {
     foreignKey: 'user_id',
   })
   declare user: BelongsTo<typeof User>
 
-  // Relasi: jawaban ini milik satu quiz
   @belongsTo(() => Quiz, {
     foreignKey: 'quiz_id',
   })
   declare quiz: BelongsTo<typeof Quiz>
 
-  // Relasi: jawaban ini berasal dari satu pertanyaan
   @belongsTo(() => Question, {
     foreignKey: 'question_id',
   })

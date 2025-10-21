@@ -4,7 +4,6 @@ import hash from '@adonisjs/core/services/hash'
 
 export default class UserSeeder extends BaseSeeder {
   async run() {
-    // Create default admin user
     await User.updateOrCreate(
       { email: 'admin@quiz.com' },
       {
@@ -15,7 +14,6 @@ export default class UserSeeder extends BaseSeeder {
       }
     )
 
-    // Create default regular user
     await User.updateOrCreate(
       { email: 'user@quiz.com' },
       {

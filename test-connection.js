@@ -12,7 +12,6 @@ const FRONTEND_URL = 'http://localhost:5173'
 
 console.log('🧪 Testing Backend Connection...\n')
 
-// Test 1: Health Check
 function testHealthCheck() {
   return new Promise((resolve, reject) => {
     const req = http.get(`${BACKEND_URL}/health`, (res) => {
@@ -34,7 +33,6 @@ function testHealthCheck() {
   })
 }
 
-// Test 2: Root Endpoint
 function testRootEndpoint() {
   return new Promise((resolve, reject) => {
     const req = http.get(`${BACKEND_URL}/`, (res) => {
@@ -56,7 +54,6 @@ function testRootEndpoint() {
   })
 }
 
-// Test 3: Quizzes Endpoint
 function testQuizzesEndpoint() {
   return new Promise((resolve, reject) => {
     const req = http.get(`${BACKEND_URL}/api/quizzes`, (res) => {
@@ -79,7 +76,6 @@ function testQuizzesEndpoint() {
   })
 }
 
-// Test 4: CORS Preflight
 function testCorsPreflight() {
   return new Promise((resolve, reject) => {
     const options = {
@@ -117,7 +113,6 @@ function testCorsPreflight() {
   })
 }
 
-// Run all tests
 async function runTests() {
   try {
     console.log('🚀 Starting Backend Connection Tests...\n')

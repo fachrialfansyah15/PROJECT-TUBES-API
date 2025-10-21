@@ -19,7 +19,19 @@ export default class AuthMiddleware {
       guards?: (keyof Authenticators)[]
     } = {}
   ) {
-    await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo })
-    return next()
+    try {
+      await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo })
+      return next()
+    } catch (error) {
+      // For API routes, return JSON error instead of redirect
+      if (ctx.request.url().startsWith('/api/')) {
+        return ctx.response.unauthorized({
+          success: false,
+          message: 'Authentication required',
+          error: 'Invalid or missing token'
+        })
+      }
+      throw error
+    }
   }
 }

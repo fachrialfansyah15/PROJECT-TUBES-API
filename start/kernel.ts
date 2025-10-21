@@ -38,7 +38,6 @@ router.use([
   () => import('@adonisjs/auth/initialize_auth_middleware'),
 ])
 
-// ✅ Tambahkan provider JWT
 app.booting(async () => {
   await import('@maximemrf/adonisjs-jwt')
 })

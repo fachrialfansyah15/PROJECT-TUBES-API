@@ -3,10 +3,6 @@ import Quiz from '#models/quiz'
 import Question from '#models/question'
 
 export default class QuizzesController {
-  /**
-   * GET /quizzes
-   * Ambil semua data quiz
-   */
   async index({ response }: HttpContext) {
     try {
       const quizzes = await Quiz.query()
@@ -63,7 +59,6 @@ export default class QuizzesController {
       const data = request.only(['title', 'description', 'questions'])
       const userId = await auth.user?.id || 1 // Default to user ID 1 if not authenticated
       
-      // Validasi input
       if (!data.title || data.title.trim() === '') {
         return response.badRequest({
           success: false,
@@ -77,7 +72,6 @@ export default class QuizzesController {
         created_by: userId,
       })
       
-      // Simpan questions jika ada
       if (data.questions && Array.isArray(data.questions)) {
         for (const q of data.questions) {
           await Question.create({
@@ -92,7 +86,6 @@ export default class QuizzesController {
         }
       }
       
-      // Load dengan questions
       await quiz.load('questions')
       
       return response.created({
@@ -114,11 +107,53 @@ export default class QuizzesController {
    * Update quiz berdasarkan id
    */
   async update({ params, request, response }: HttpContext) {
-    const quiz = await Quiz.findOrFail(params.id)
-    const data = request.only(['title', 'description'])
-    quiz.merge(data)
-    await quiz.save()
-    return response.ok(quiz)
+    try {
+      const quiz = await Quiz.findOrFail(params.id)
+      const data = request.only(['title', 'description', 'questions'])
+      
+      if (!data.title || data.title.trim() === '') {
+        return response.badRequest({
+          success: false,
+          message: 'Title is required'
+        })
+      }
+
+      quiz.merge({
+        title: data.title.trim(),
+        description: data.description?.trim() || '',
+      })
+      await quiz.save()
+
+      if (data.questions && Array.isArray(data.questions)) {
+        await Question.query().where('quiz_id', quiz.id).delete()
+        
+        for (const q of data.questions) {
+          await Question.create({
+            quiz_id: quiz.id,
+            question_text: q.prompt || '',
+            option_a: q.options?.[0]?.text || '',
+            option_b: q.options?.[1]?.text || '',
+            option_c: q.options?.[2]?.text || '',
+            option_d: q.options?.[3]?.text || '',
+            correct_answer: q.answerId || 'a',
+          })
+        }
+      }
+
+      await quiz.load('questions')
+      
+      return response.ok({
+        success: true,
+        data: quiz,
+        message: 'Quiz updated successfully'
+      })
+    } catch (error) {
+      return response.badRequest({
+        success: false,
+        message: 'Failed to update quiz',
+        error: error.message
+      })
+    }
   }
 
   /**

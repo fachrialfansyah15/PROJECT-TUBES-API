@@ -1,4 +1,3 @@
-// API Service untuk koneksi ke backend
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3333/api'
 
 class ApiService {
@@ -8,9 +7,14 @@ class ApiService {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`
+    
+    // Get token from localStorage
+    const token = this.getToken()
+    
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
         ...options.headers,
       },
       ...options,
@@ -31,7 +35,19 @@ class ApiService {
     }
   }
 
-  // Quiz endpoints
+  getToken() {
+    try {
+      const user = localStorage.getItem('quiz_user')
+      if (user) {
+        const userData = JSON.parse(user)
+        return userData.token || null
+      }
+      return null
+    } catch {
+      return null
+    }
+  }
+
   async getQuizzes() {
     return this.request('/quizzes')
   }
@@ -57,6 +73,20 @@ class ApiService {
   async deleteQuiz(id) {
     return this.request(`/quizzes/${id}`, {
       method: 'DELETE',
+    })
+  }
+
+  async login(email, password) {
+    return this.request('/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
+  }
+
+  async register(name, email, password) {
+    return this.request('/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password }),
     })
   }
 }

@@ -14,7 +14,6 @@ async function runMigration() {
   try {
     console.log('🔄 Running database migration...')
     
-    // Coba dengan npx ace
     try {
       const { stdout, stderr } = await execAsync('npx ace migration:run')
       console.log('✅ Migration completed successfully!')
@@ -23,7 +22,6 @@ async function runMigration() {
     } catch (error) {
       console.log('❌ npx ace failed, trying alternative method...')
       
-      // Coba dengan node ace.js
       try {
         const { stdout, stderr } = await execAsync('node ace.js migration:run')
         console.log('✅ Migration completed successfully!')
@@ -32,7 +30,6 @@ async function runMigration() {
       } catch (error2) {
         console.log('❌ node ace.js failed, trying direct execution...')
         
-        // Coba dengan node bin/server.js untuk test
         console.log('🔧 Testing server startup instead...')
         const { stdout, stderr } = await execAsync('timeout 5 node bin/server.js')
         console.log('✅ Server can start (routes are valid)')

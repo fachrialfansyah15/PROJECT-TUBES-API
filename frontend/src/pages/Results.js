@@ -10,7 +10,6 @@ export default function Results() {
   const navigate = useNavigate()
   const { logout } = useAuth()
   
-  // Get result from navigation state, fallback to default
   const correct = location.state?.correct ?? 0
   const total = location.state?.total ?? 0
   const percentage = location.state?.percentage ?? 0

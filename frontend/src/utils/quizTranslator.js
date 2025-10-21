@@ -1,9 +1,3 @@
-/**
- * Quiz Translator Utility
- * Auto-translate English quiz data to Bahasa Indonesia
- */
-
-// Dictionary untuk translate quiz titles & descriptions
 const QUIZ_TRANSLATIONS = {
   'General Knowledge': {
     title: 'Pengetahuan Umum',
@@ -27,7 +21,6 @@ const QUIZ_TRANSLATIONS = {
   }
 }
 
-// Common English phrases untuk deteksi
 const ENGLISH_PATTERNS = [
   'A mix of everyday facts',
   'Test your knowledge',
@@ -45,17 +38,14 @@ const ENGLISH_PATTERNS = [
 export function isEnglish(text) {
   if (!text) return false
   
-  // Cek pattern umum Bahasa Inggris
   for (const pattern of ENGLISH_PATTERNS) {
     if (text.includes(pattern)) return true
   }
   
-  // Cek apakah ada banyak kata Bahasa Inggris common
   const englishWords = ['the', 'is', 'are', 'your', 'you', 'about', 'what', 'which', 'where', 'how']
   const words = text.toLowerCase().split(/\s+/)
   const englishCount = words.filter(w => englishWords.includes(w)).length
   
-  // Jika >30% kata adalah Bahasa Inggris common, anggap English
   return englishCount / words.length > 0.3
 }
 
@@ -65,12 +55,10 @@ export function isEnglish(text) {
 export function translateQuizTitle(title) {
   if (!title) return title
   
-  // Cek exact match di dictionary
   if (QUIZ_TRANSLATIONS[title]) {
     return QUIZ_TRANSLATIONS[title].title
   }
   
-  // Return original jika tidak ada translate
   return title
 }
 
@@ -80,12 +68,10 @@ export function translateQuizTitle(title) {
 export function translateQuizDescription(title, description) {
   if (!description) return description
   
-  // Cek berdasarkan title
   if (QUIZ_TRANSLATIONS[title]) {
     return QUIZ_TRANSLATIONS[title].description
   }
   
-  // Return original jika tidak ada translate
   return description
 }
 
@@ -97,12 +83,10 @@ export function translateQuiz(quiz) {
   
   const translated = { ...quiz }
   
-  // Translate title jika Bahasa Inggris
   if (isEnglish(quiz.title)) {
     translated.title = translateQuizTitle(quiz.title)
   }
   
-  // Translate description jika Bahasa Inggris
   if (isEnglish(quiz.description)) {
     translated.description = translateQuizDescription(quiz.title, quiz.description)
   }
@@ -140,7 +124,6 @@ export function validateQuizLanguage(quiz) {
     })
   }
   
-  // Cek questions
   if (Array.isArray(quiz.questions)) {
     quiz.questions.forEach((q, idx) => {
       if (isEnglish(q.prompt)) {

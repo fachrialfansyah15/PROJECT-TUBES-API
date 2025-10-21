@@ -9,7 +9,6 @@ export default class QuizDataSeeder extends BaseSeeder {
   async run() {
     console.log('🌱 Seeding quiz data...')
 
-    // 1. Create Quizzes
     const quizzes = await Quiz.createMany([
       {
         title: 'Dasar Pemrograman',
@@ -35,9 +34,7 @@ export default class QuizDataSeeder extends BaseSeeder {
 
     console.log(`✅ Created ${quizzes.length} quizzes`)
 
-    // 2. Create Questions
     const questions = await Question.createMany([
-      // Kuis: Dasar Pemrograman (quiz_id = quizzes[0].id) - 5 soal
       {
         quiz_id: quizzes[0].id,
         question_text: 'Apa yang dimaksud dengan variabel dalam pemrograman?',
@@ -84,7 +81,6 @@ export default class QuizDataSeeder extends BaseSeeder {
         correct_answer: 'B',
       },
 
-      // Kuis: Teknologi Informasi Umum (quiz_id = quizzes[1].id) - 5 soal
       {
         quiz_id: quizzes[1].id,
         question_text: 'Apa kepanjangan dari "URL"?',
@@ -131,7 +127,6 @@ export default class QuizDataSeeder extends BaseSeeder {
         correct_answer: 'B',
       },
 
-      // Kuis: Matematika Dasar (quiz_id = quizzes[2].id) - 5 soal
       {
         quiz_id: quizzes[2].id,
         question_text: 'Hasil dari 12 × 8 adalah?',
@@ -178,7 +173,6 @@ export default class QuizDataSeeder extends BaseSeeder {
         correct_answer: 'B',
       },
 
-      // Kuis: Basis Data (quiz_id = quizzes[3].id) - 5 soal
       {
         quiz_id: quizzes[3].id,
         question_text: 'Apa fungsi utama dari SQL?',
@@ -228,37 +222,31 @@ export default class QuizDataSeeder extends BaseSeeder {
 
     console.log(`✅ Created ${questions.length} questions`)
 
-    // 3. Create Results
     const results = await Result.createMany([
-      // User mengerjakan Dasar Pemrograman
       {
         user_id: 2,
         quiz_id: quizzes[0].id,
         score: 85,
         submitted_at: DateTime.now(),
       },
-      // User mengerjakan Teknologi Informasi Umum
       {
         user_id: 2,
         quiz_id: quizzes[1].id,
         score: 90,
         submitted_at: DateTime.now(),
       },
-      // User mengerjakan Matematika Dasar
       {
         user_id: 2,
         quiz_id: quizzes[2].id,
         score: 75,
         submitted_at: DateTime.now(),
       },
-      // User mengerjakan Basis Data
       {
         user_id: 2,
         quiz_id: quizzes[3].id,
         score: 80,
         submitted_at: DateTime.now(),
       },
-      // Admin mencoba Dasar Pemrograman
       {
         user_id: 1,
         quiz_id: quizzes[0].id,
@@ -269,89 +257,82 @@ export default class QuizDataSeeder extends BaseSeeder {
 
     console.log(`✅ Created ${results.length} results`)
 
-    // 4. Create User Answers
     const userAnswers = await UserAnswer.createMany([
-      // User menjawab kuis Dasar Pemrograman
       {
         user_id: 2,
         quiz_id: quizzes[0].id,
-        question_id: questions[0].id, // Pertanyaan pertama
+        question_id: questions[0].id,
         chosen_answer: 'A',
         is_correct: true,
       },
       {
         user_id: 2,
         quiz_id: quizzes[0].id,
-        question_id: questions[1].id, // Pertanyaan kedua
+        question_id: questions[1].id,
         chosen_answer: 'C',
         is_correct: false,
       },
       {
         user_id: 2,
         quiz_id: quizzes[0].id,
-        question_id: questions[2].id, // Pertanyaan ketiga
+        question_id: questions[2].id,
         chosen_answer: 'B',
         is_correct: true,
       },
 
-      // User menjawab kuis Teknologi Informasi Umum
       {
         user_id: 2,
         quiz_id: quizzes[1].id,
-        question_id: questions[5].id, // Pertanyaan keenam
+        question_id: questions[5].id,
         chosen_answer: 'D',
         is_correct: true,
       },
       {
         user_id: 2,
         quiz_id: quizzes[1].id,
-        question_id: questions[6].id, // Pertanyaan ketujuh
+        question_id: questions[6].id,
         chosen_answer: 'A',
         is_correct: true,
       },
-
-      // User menjawab kuis Matematika Dasar
       {
         user_id: 2,
         quiz_id: quizzes[2].id,
-        question_id: questions[10].id, // Pertanyaan kesebelas
+        question_id: questions[10].id,
         chosen_answer: 'C',
         is_correct: true,
       },
       {
         user_id: 2,
         quiz_id: quizzes[2].id,
-        question_id: questions[11].id, // Pertanyaan keduabelas
+        question_id: questions[11].id,
         chosen_answer: 'B',
         is_correct: false,
       },
       {
         user_id: 2,
         quiz_id: quizzes[2].id,
-        question_id: questions[12].id, // Pertanyaan ketigabelas
+        question_id: questions[12].id,
         chosen_answer: 'B',
         is_correct: true,
       },
-
-      // Admin mencoba kuis Dasar Pemrograman dengan hasil sempurna
       {
         user_id: 1,
         quiz_id: quizzes[0].id,
-        question_id: questions[0].id, // Pertanyaan pertama
+        question_id: questions[0].id,
         chosen_answer: 'A',
         is_correct: true,
       },
       {
         user_id: 1,
         quiz_id: quizzes[0].id,
-        question_id: questions[1].id, // Pertanyaan kedua
+        question_id: questions[1].id,
         chosen_answer: 'B',
         is_correct: true,
       },
       {
         user_id: 1,
         quiz_id: quizzes[0].id,
-        question_id: questions[2].id, // Pertanyaan ketiga
+        question_id: questions[2].id,
         chosen_answer: 'B',
         is_correct: true,
       },

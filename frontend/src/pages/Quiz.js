@@ -18,7 +18,6 @@ export default function Quiz() {
   const [isTranslating, setIsTranslating] = useState(false)
   const total = quiz?.questions.length ?? 0
 
-  // Auto-translate quiz on mount
   useEffect(() => {
     async function translateQuizContent() {
       if (!originalQuiz) return
@@ -42,7 +41,6 @@ export default function Quiz() {
 
   const h = React.createElement
   
-  // Show loading state while translating
   if (isTranslating) {
     return h(
       'div',

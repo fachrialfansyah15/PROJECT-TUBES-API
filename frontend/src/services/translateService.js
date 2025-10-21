@@ -3,7 +3,6 @@
  * Free API for translating quiz questions and options
  */
 
-// LibreTranslate public instances (free to use)
 const LIBRE_TRANSLATE_ENDPOINTS = [
   'https://libretranslate.com/translate',
   'https://translate.argosopentech.com/translate',
@@ -18,7 +17,6 @@ let currentEndpointIndex = 0
 function isEnglish(text) {
   if (!text || typeof text !== 'string') return false
   
-  // Common English words
   const englishWords = [
     'the', 'is', 'are', 'was', 'were', 'what', 'which', 'where', 'when', 'who',
     'how', 'many', 'much', 'some', 'any', 'your', 'you', 'their', 'about'
@@ -27,7 +25,6 @@ function isEnglish(text) {
   const words = text.toLowerCase().split(/\s+/)
   const englishCount = words.filter(w => englishWords.includes(w)).length
   
-  // If >25% are English words, consider it English
   return englishCount / words.length > 0.25
 }
 
@@ -64,16 +61,13 @@ async function translateText(text, sourceLang = 'en', targetLang = 'id') {
   } catch (error) {
     console.warn(`Translation failed with endpoint ${endpoint}:`, error.message)
     
-    // Try next endpoint
     currentEndpointIndex = (currentEndpointIndex + 1) % LIBRE_TRANSLATE_ENDPOINTS.length
     
-    // If all endpoints failed, return original
     if (currentEndpointIndex === 0) {
       console.error('All translation endpoints failed, returning original text')
       return text
     }
     
-    // Retry with next endpoint
     return translateText(text, sourceLang, targetLang)
   }
 }
@@ -85,10 +79,8 @@ export async function translateQuestion(question) {
   if (!question) return question
 
   try {
-    // Translate prompt
     const translatedPrompt = await translateText(question.prompt)
     
-    // Translate options
     const translatedOptions = await Promise.all(
       question.options.map(async (option) => ({
         ...option,
@@ -116,11 +108,9 @@ export async function translateQuiz(quiz) {
   }
 
   try {
-    // Translate title and description if needed
     const translatedTitle = await translateText(quiz.title)
     const translatedDescription = await translateText(quiz.description)
     
-    // Translate all questions
     const translatedQuestions = await Promise.all(
       quiz.questions.map(q => translateQuestion(q))
     )
@@ -144,14 +134,12 @@ export async function translateBatch(texts, sourceLang = 'en', targetLang = 'id'
   const endpoint = LIBRE_TRANSLATE_ENDPOINTS[currentEndpointIndex]
   
   try {
-    // Filter out non-English texts
     const textsToTranslate = texts.map((text, index) => ({
       index,
       text,
       needsTranslation: isEnglish(text)
     }))
 
-    // Translate only English texts
     const translations = await Promise.all(
       textsToTranslate.map(async ({ text, needsTranslation }) => {
         if (!needsTranslation) return text
@@ -199,7 +187,6 @@ export async function translateQuizOptimized(quiz) {
   }
 
   try {
-    // Collect all texts to translate
     const textsToTranslate = [
       quiz.title,
       quiz.description,
@@ -209,10 +196,8 @@ export async function translateQuizOptimized(quiz) {
       ])
     ]
 
-    // Batch translate
     const translated = await translateBatch(textsToTranslate)
 
-    // Reconstruct quiz with translations
     let index = 0
     const translatedTitle = translated[index++]
     const translatedDescription = translated[index++]

@@ -86,31 +86,31 @@ export default function AdminCreateQuiz() {
         h('div', { className: 'mb-4 font-medium' }, 'Tambah Pertanyaan'),
         h(
           'div',
-          { className: 'space-y-6' },
+          { key: 'questions-list', className: 'space-y-6' },
           questions.map((q, idx) =>
             h('div', { key: q.id, className: 'rounded-xl border border-[var(--color-border)] bg-white p-4' }, [
-              h('div', { className: 'mb-3 grid gap-2' }, [
-                h('label', { className: 'text-sm' }, 'Pertanyaan'),
-                h('input', { className: 'h-11 rounded-xl border border-[var(--color-border)] bg-white px-3', placeholder: 'Masukkan pertanyaan', value: q.prompt, onChange: (e) => updateQuestionPrompt(q.id, e.target.value) }),
+              h('div', { key: 'question-field', className: 'mb-3 grid gap-2' }, [
+                h('label', { key: 'question-label', className: 'text-sm' }, 'Pertanyaan'),
+                h('input', { key: 'question-input', className: 'h-11 rounded-xl border border-[var(--color-border)] bg-white px-3', placeholder: 'Masukkan pertanyaan', value: q.prompt, onChange: (e) => updateQuestionPrompt(q.id, e.target.value) }),
               ]),
               h(
                 'div',
-                { className: 'grid gap-3 md:grid-cols-2' },
+                { key: 'options-container', className: 'grid gap-3 md:grid-cols-2' },
                 q.options.map((o, i) =>
                   h('div', { key: o.id, className: 'grid gap-2' }, [
-                    h('label', { className: 'text-sm' }, `Pilihan ${String.fromCharCode(65 + i)}`),
-                    h('input', { className: 'h-11 rounded-xl border border-[var(--color-border)] bg-white px-3', placeholder: `Opsi ${String.fromCharCode(65 + i)}`, value: o.text, onChange: (e) => updateOption(q.id, o.id, e.target.value) }),
+                    h('label', { key: `option-label-${i}`, className: 'text-sm' }, `Pilihan ${String.fromCharCode(65 + i)}`),
+                    h('input', { key: `option-input-${i}`, className: 'h-11 rounded-xl border border-[var(--color-border)] bg-white px-3', placeholder: `Opsi ${String.fromCharCode(65 + i)}`, value: o.text, onChange: (e) => updateOption(q.id, o.id, e.target.value) }),
                   ])
                 )
               ),
-              h('div', { className: 'mt-4 grid gap-2' }, [
-                h('div', { className: 'text-sm' }, 'Jawaban Benar'),
+              h('div', { key: 'answer-section', className: 'mt-4 grid gap-2' }, [
+                h('div', { key: 'answer-label', className: 'text-sm' }, 'Jawaban Benar'),
                 h(
                   'div',
-                  { className: 'flex items-center gap-4 text-sm' },
+                  { key: 'answer-options', className: 'flex items-center gap-4 text-sm' },
                   q.options.map((o, i) =>
                     h('label', { key: o.id, className: 'inline-flex items-center gap-2' }, [
-                      h('input', { type: 'radio', name: `ans-${idx}`, checked: q.answerId === o.id, onChange: () => setAnswer(q.id, o.id) }),
+                      h('input', { key: `radio-${i}`, type: 'radio', name: `ans-${idx}`, checked: q.answerId === o.id, onChange: () => setAnswer(q.id, o.id) }),
                       String.fromCharCode(65 + i),
                     ])
                   )
