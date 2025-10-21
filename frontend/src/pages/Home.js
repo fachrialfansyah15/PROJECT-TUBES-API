@@ -48,7 +48,7 @@ export default function Home() {
               h('div', { key: 'error-box', className: 'rounded-lg bg-red-50 border border-red-200 p-6' }, [
                 h('p', { key: 'error-title', className: 'text-red-600 font-medium' }, 'Gagal memuat kuis'),
                 h('p', { key: 'error-message', className: 'text-red-500 text-sm mt-2' }, error),
-                h('p', { key: 'error-hint', className: 'text-sm text-[var(--color-muted)] mt-4' }, 'Pastikan backend sudah berjalan di http://localhost:3333')
+                h('p', { key: 'error-hint', className: 'text-sm text-[var(--color-muted)] mt-4' }, 'Pastikan backend sudah berjalan')
               ])
             ])
           : quizzes.length === 0

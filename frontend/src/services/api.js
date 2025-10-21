@@ -8,7 +8,6 @@ class ApiService {
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`
     
-    // Get token from localStorage
     const token = this.getToken()
     
     const config = {

@@ -9,7 +9,7 @@ export default function Quiz() {
   const navigate = useNavigate()
   const { id } = useParams()
   const originalQuiz = useQuizById(id)
-  const { addResult } = useQuizStore()
+  const { addResult, refetch } = useQuizStore()
   const { logout } = useAuth()
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState(null)
@@ -17,6 +17,12 @@ export default function Quiz() {
   const [quiz, setQuiz] = useState(originalQuiz)
   const [isTranslating, setIsTranslating] = useState(false)
   const total = quiz?.questions.length ?? 0
+
+  useEffect(() => {
+    if (!originalQuiz) {
+      refetch()
+    }
+  }, [originalQuiz, refetch])
 
   useEffect(() => {
     async function translateQuizContent() {
@@ -28,7 +34,7 @@ export default function Quiz() {
         setQuiz(translated)
       } catch (error) {
         console.error('Translation failed:', error)
-        setQuiz(originalQuiz) // Fallback to original
+        setQuiz(originalQuiz)
       } finally {
         setIsTranslating(false)
       }

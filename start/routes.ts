@@ -24,53 +24,35 @@ router.get('/health', async ({ response }) => {
 })
 
 
-// Public routes (tidak perlu authentication)
 router
   .group(() => {
-    // Quiz routes untuk user
     router.get('/quizzes', [QuizzesController, 'index'])
     router.get('/quizzes/:id', [QuizzesController, 'show'])
-    
-    // Quiz management routes (temporary public for demo)
     router.post('/quizzes', [QuizzesController, 'store'])
     router.put('/quizzes/:id', [QuizzesController, 'update'])
     router.delete('/quizzes/:id', [QuizzesController, 'destroy'])
-    
-    // Auth routes
     router.post('/register', [AuthController, 'register'])
     router.post('/login', [AuthController, 'login'])
-    
-    // Results routes untuk user (untuk melihat hasil quiz)
     router.get('/results', [ResultsController, 'index'])
     router.get('/results/:id', [ResultsController, 'show'])
     router.post('/results', [ResultsController, 'store'])
-    
-    // User answers routes untuk user
     router.post('/user_answers', [UserAnswersController, 'store'])
   })
   .prefix('/api')
 
-// Protected routes (perlu authentication)
 router
   .group(() => {
-    // Admin user management
     router.get('/users', [UsersController, 'index'])
     router.get('/users/:id', [UsersController, 'show'])
     router.post('/users', [UsersController, 'store'])
     router.put('/users/:id', [UsersController, 'update'])
     router.delete('/users/:id', [UsersController, 'destroy'])
-    
-    // Admin results management
     router.put('/results/:id', [ResultsController, 'update'])
     router.delete('/results/:id', [ResultsController, 'destroy'])
-    
-    // Admin user answers management
     router.get('/user_answers', [UserAnswersController, 'index'])
     router.get('/user_answers/:id', [UserAnswersController, 'show'])
     router.put('/user_answers/:id', [UserAnswersController, 'update'])
     router.delete('/user_answers/:id', [UserAnswersController, 'destroy'])
-    
-    // Admin questions management
     router.get('/questions', [QuestionsController, 'index'])
     router.get('/questions/:id', [QuestionsController, 'show'])
     router.post('/questions', [QuestionsController, 'store'])

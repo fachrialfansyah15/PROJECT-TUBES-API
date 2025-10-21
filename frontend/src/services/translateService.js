@@ -1,8 +1,3 @@
-/**
- * Translation Service using LibreTranslate API
- * Free API for translating quiz questions and options
- */
-
 const LIBRE_TRANSLATE_ENDPOINTS = [
   'https://libretranslate.com/translate',
   'https://translate.argosopentech.com/translate',
@@ -11,9 +6,6 @@ const LIBRE_TRANSLATE_ENDPOINTS = [
 
 let currentEndpointIndex = 0
 
-/**
- * Detect if text is in English
- */
 function isEnglish(text) {
   if (!text || typeof text !== 'string') return false
   
@@ -27,13 +19,9 @@ function isEnglish(text) {
   
   return englishCount / words.length > 0.25
 }
-
-/**
- * Translate text using LibreTranslate API
- */
 async function translateText(text, sourceLang = 'en', targetLang = 'id') {
   if (!text || !isEnglish(text)) {
-    return text // Already Indonesian or empty
+    return text
   }
 
   const endpoint = LIBRE_TRANSLATE_ENDPOINTS[currentEndpointIndex]
@@ -95,7 +83,7 @@ export async function translateQuestion(question) {
     }
   } catch (error) {
     console.error('Failed to translate question:', error)
-    return question // Return original on error
+    return question
   }
 }
 
@@ -123,7 +111,7 @@ export async function translateQuiz(quiz) {
     }
   } catch (error) {
     console.error('Failed to translate quiz:', error)
-    return quiz // Return original on error
+    return quiz
   }
 }
 
@@ -174,7 +162,7 @@ export async function translateBatch(texts, sourceLang = 'en', targetLang = 'id'
     return translations
   } catch (error) {
     console.error('Batch translation failed:', error)
-    return texts // Return originals on error
+    return texts
   }
 }
 

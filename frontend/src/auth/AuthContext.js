@@ -34,7 +34,6 @@ export function AuthProvider({ children }) {
     const normalized = email.trim().toLowerCase()
     console.log('AuthContext - Login attempt:', { email: normalized })
 
-    // Use dummy authentication for demo purposes
     const role = normalized === 'admin@quiz.com' ? 'admin' : 'user'
     const newUser = {
       email: normalized,

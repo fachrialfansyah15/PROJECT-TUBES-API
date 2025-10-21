@@ -39,9 +39,12 @@ export function QuizStoreProvider({ children }) {
     try {
       setLoading(true)
       setError(null)
+      console.log('Fetching quizzes from API...')
       const response = await api.getQuizzes()
+      console.log('API Response:', response)
       
       const data = response.data || response
+      console.log('Quiz data:', data)
               const transformedQuizzes = data.map((quiz) => ({
                 id: quiz.id.toString(),
                 title: quiz.title || 'Untitled Quiz',
@@ -53,14 +56,14 @@ export function QuizStoreProvider({ children }) {
                 }) : 'Unknown Date',
                 questions: Array.isArray(quiz.questions) ? quiz.questions.map((q) => ({
                   id: q.id.toString(),
-                  prompt: q.question_text || '',
+                  prompt: q.questionText || q.question_text || '',
                   options: [
-                    { id: 'a', text: q.option_a || '' },
-                    { id: 'b', text: q.option_b || '' },
-                    { id: 'c', text: q.option_c || '' },
-                    { id: 'd', text: q.option_d || '' },
+                    { id: 'a', text: q.optionA || q.option_a || '' },
+                    { id: 'b', text: q.optionB || q.option_b || '' },
+                    { id: 'c', text: q.optionC || q.option_c || '' },
+                    { id: 'd', text: q.optionD || q.option_d || '' },
                   ],
-                  answerId: q.correct_answer || 'a',
+                  answerId: q.correctAnswer || q.correct_answer || 'a',
                 })) : [],
               }))
       
@@ -119,7 +122,6 @@ export function QuizStoreProvider({ children }) {
       const response = await api.updateQuiz(id, quizData)
       const updatedQuiz = response.data || response
       
-      // Update local state with server response
       setQuizzes((prev) => prev.map((q) => 
         q.id === id ? { 
           ...q, 

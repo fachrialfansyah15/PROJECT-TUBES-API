@@ -24,10 +24,6 @@ export default class QuizzesController {
     }
   }
 
-  /**
-   * GET /quizzes/:id
-   * Ambil detail quiz berdasarkan id
-   */
   async show({ params, response }: HttpContext) {
     try {
       const quiz = await Quiz.query()
@@ -57,7 +53,7 @@ export default class QuizzesController {
   async store({ request, response, auth }: HttpContext) {
     try {
       const data = request.only(['title', 'description', 'questions'])
-      const userId = await auth.user?.id || 1 // Default to user ID 1 if not authenticated
+      const userId = await auth.user?.id || 1
       
       if (!data.title || data.title.trim() === '') {
         return response.badRequest({
