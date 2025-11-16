@@ -7,6 +7,8 @@ import UserAnswersController from '#controllers/user_answers_controller'
 import SessionController from '#controllers/auth_controller'
 import SuperAdminController from '#controllers/superadmins_controller'
 import { middleware } from './kernel.js'
+import NumbersController from '#controllers/numbers_controller'
+import ExternalQuizController from '#controllers/open_trivias_controller'
 
 router.get('/', async () => {
   return { hello: 'world' }
@@ -87,6 +89,8 @@ router
     router
       .delete('/questions/:id', [QuestionsController, 'destroy'])
       .use(middleware.role(['superadmin', 'admin']))
+    router.get('/numbers/random', [NumbersController, 'random']).use(middleware.role(['superadmin', 'admin', 'user']))
+    router.get('/external/trivia', [ExternalQuizController, 'getTrivia']).use(middleware.role(['superadmin', 'admin', 'user']))
   })
   .prefix('/api')
   .use(middleware.auth())
